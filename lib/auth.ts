@@ -6,8 +6,18 @@ import { createHash, timingSafeEqual } from "node:crypto";
 
 const COOKIE = "ht_session";
 
+// Phone keyboards capitalize, add spaces and turn "-" into "–"; ignore all that.
+function normalize(pass: string) {
+  return pass
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 function token(pass: string) {
-  return createHash("sha256").update(`habit-tower:${pass}`).digest("hex");
+  return createHash("sha256").update(`habit-tower:${normalize(pass)}`).digest("hex");
 }
 
 function same(a: string, b: string) {
